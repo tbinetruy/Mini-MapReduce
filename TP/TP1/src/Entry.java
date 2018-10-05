@@ -21,9 +21,7 @@ class Line {
 public class Entry {
     String fileContent;
     ArrayList<Line> wc;
-    public Entry(String filename) {
-        this.setFileContent(filename);
-
+    public void countWords() {
         String[] content = this.fileContent
             .replace("\n", " ")
             .split(" ");
@@ -38,11 +36,20 @@ public class Entry {
             }
         }
 
-        // System.out.println(Arrays.asList(map));
-
         this.wc = this.hashMapToList(map);
-        // this.printWc();
         this.deepSortWc();
+    }
+    public Entry(String filename) {
+        long startTime = System.currentTimeMillis();
+
+        this.setFileContent(filename);
+        this.countWords();
+
+        long endTime   = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println("Total sort time: ".concat(Long.toString(totalTime)).concat("ms"));
+        System.out.println("========");
+
         this.printWc();
     }
     public void printWc() {
@@ -89,6 +96,6 @@ public class Entry {
         }
     }
     public static void main(String[] args) {
-        Entry e = new Entry("words.dat");
+        Entry e = new Entry("sante_publique.txt");
     }
 }
