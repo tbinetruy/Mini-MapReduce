@@ -352,3 +352,16 @@ ssh binetruy@$HOST_C "cat /tmp/binetruy/local.txt"
 
 * Etape 4: lancer des programmes java à distance manuellement.
   
+** 33: Exécution sur disque dur local
+   
+1. Créez le répertoire ~/tmp/<votre nom d’utilisateur>/~
+2. Copiez  slave.jar exécutable dans le répertoire ~/tmp/<votre nom d’utilisateur>/~
+3. Testez et Lancer le ~slave.jar~ en ligne de commande sur votre ordinateur local.
+
+#+begin_src sh :session tp
+scp ~/Documents/Telecom/cours/systemes\ repartis\ \(INF727\)/TP/TP1/src/ binetruy@$HOST_A:/tmp/binetruy/
+#+end_src
+
+
+#+RESULTS:
+: /home/thomas/Documents/Telecom/cours/systemes repartis (INF727)/TP/TP1/src: not a regular file
