@@ -24,7 +24,7 @@ public class Master {
                 Process p = pb.start();
                 list_p.add(p);
             } catch (IOException e) {
-                System.out.println("An error has occurred while starting the process " + Integer.toString(1) + ".");
+                System.err.println("An error has occurred while starting the process " + Integer.toString(1) + ".");
             }
         }
 
@@ -32,7 +32,7 @@ public class Master {
             try {
                 p.waitFor();
             } catch(InterruptedException e) {
-                System.out.println("An error has occurred while waiting for a process.");
+                System.err.println("An error has occurred while waiting for a process.");
             }
         }
 
@@ -51,7 +51,7 @@ public class Master {
             String line = br.readLine();
             System.out.println(line);
         } catch (IOException e) {
-            System.out.println("Error while reading process output.");
+            System.err.println("Error while reading process output.");
         }
     }
     public static void main(String[] args) {
