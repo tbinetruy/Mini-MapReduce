@@ -359,9 +359,55 @@ ssh binetruy@$HOST_C "cat /tmp/binetruy/local.txt"
 3. Testez et Lancer le ~slave.jar~ en ligne de commande sur votre ordinateur local.
 
 #+begin_src sh :session tp
-scp ~/Documents/Telecom/cours/systemes\ repartis\ \(INF727\)/TP/TP1/src/ binetruy@$HOST_A:/tmp/binetruy/
+scp ~/Documents/Telecom/cours/systemes\ repartis\ \(INF727\)/TP/TP1/src/Slave.jar binetruy@$HOST_A:/tmp/binetruy/
 #+end_src
 
 
 #+RESULTS:
-: /home/thomas/Documents/Telecom/cours/systemes repartis (INF727)/TP/TP1/src: not a regular file
+|                                                                                                        |
+| 0     0.0KB/s   --:-- ETASlave.jar                                     100%  984   172.4KB/s   00:00 |
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A java -jar /tmp/binetruy/Slave.jar
+#+end_src
+
+#+RESULTS:
+: 3
+
+** 34: Copie du JAR et exécution distante
+   
+1. Depuis la machine A contenant ~/tmp/<votre nom d’utilisateur>/slave.jar~
+2. Créez à distance sur la machine B (s’il n’existe pas) un répertoire ~/tmp/<votre nom d’utilisateur>/~
+3. Copiez ~slave.jar~ sur la machine B dans le répertoire ~/tmp/<votre nom d’utilisateur>/~
+4. Exécutez à distance (depuis A sur la machine B) le ~slave.jar~.
+5. Quelle est la commande tapée pour effectuer cette dernière action ?
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_B mkdir /tmp/binetruy/
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "scp /tmp/binetruy/Slave.jar binetruy@$HOST_B:/tmp/binetruy/"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "ssh binetruy@$HOST_B java -jar /tmp/binetruy/Slave.jar"
+#+end_src
+
+#+RESULTS:
+: 3
+
+* Etape 5: lancer des programmes en ligne de commande depuis java et afficher la sortie standard et la sortie d’erreur.
+  
+
+** 35: Un programme MASTER java qui lance un autre programme en ligne de commande!
+   
+Ecrire un programme java nommé “MASTER” qui lance la commande suivante en utilisant ProcessBuilder: ~ls -al /tmp~ (vous pouvez aussi tester cette commande dans un terminal avant)
+
+Récupérer et afficher la sortie de cette commande.
+
+Vous devez utiliser ProcessBuilder de cette façon: ~ProcessBuilder pb = new ProcessBuilder("ls", “-al”, “/tmp”);~
