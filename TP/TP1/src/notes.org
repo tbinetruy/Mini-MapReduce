@@ -352,6 +352,14 @@ ssh binetruy@$HOST_C "cat /tmp/binetruy/local.txt"
 
 * Etape 4: lancer des programmes java à distance manuellement.
   
+** 32: Exporter un JAR
+
+#+begin_src sh :session tp
+jar cmf Slave.mf Slave.jar Slave.class Slave.java
+#+end_src
+
+#+RESULTS:
+
 ** 33: Exécution sur disque dur local
    
 1. Créez le répertoire ~/tmp/<votre nom d’utilisateur>/~
