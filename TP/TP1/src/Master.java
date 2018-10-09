@@ -1,39 +1,58 @@
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.util.ArrayList;
+import java.io.IOException;
+import java.lang.InterruptedException;
+
 
 public class Master {
     public Master() {
-        ArrayList<String> liste_m = new ArrayList<>();
-        ArrayList<Process> liste_p = new ArrayList<>();
-        list_m.add("c133-06");
+        ArrayList<String> list_m = new ArrayList<>();
+        ArrayList<Process> list_p = new ArrayList<>();
         list_m.add("c133-07");
         list_m.add("c133-08");
-        list_m.add("c133-09");
 
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < list_m.size(); i++) {
             ProcessBuilder pb = new ProcessBuilder("ssh",
-                                                   "binetruy@" + liste_m.get(i),
+                                                   "binetruy@" + list_m.get(i),
                                                    "java",
                                                    "-jar",
-                                                   "slave.jar");
-            Process p = pb.start();
-            liste_p.add(p);
+                                                   "/tmp/binetruy/Slave.jar");
+            try {
+                Process p = pb.start();
+                list_p.add(p);
+            } catch (IOException e) {
+                System.out.println("An error has occurred while starting the process " + Integer.toString(1) + ".");
+            }
         }
 
-        for(Process p : liste_p) {
-            p.waitFor();
+        for(Process p : list_p) {
+            try {
+                p.waitFor();
+            } catch(InterruptedException e) {
+                System.out.println("An error has occurred while waiting for a process.");
+            }
         }
 
         for(Process p : list_p) {
             this.readOutput(p);
         }
     }
-    public String readOutput(Process p) {
+    public void readOutput(Process p) {
         InputStream is = p.getInputStream();
         InputStream is2 = p.getErrorStream();
-        BufferInputStream bis = new BufferInputStream(is);
+        BufferedInputStream bis = new BufferedInputStream(is);
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
-        String line = br.readline();
-        return line;
+
+        try {
+            String line = br.readLine();
+            System.out.println(line);
+        } catch (IOException e) {
+            System.out.println("Error while reading process output.");
+        }
     }
     public static void main(String[] args) {
         Master m = new Master();
