@@ -40,19 +40,31 @@ public class Master {
             this.readOutput(p);
         }
     }
-    public void readOutput(Process p) {
-        InputStream is = p.getInputStream();
-        InputStream is2 = p.getErrorStream();
+    public void inputString2String(InputStream is, boolean isError) {
         BufferedInputStream bis = new BufferedInputStream(is);
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
 
         try {
             String line = br.readLine();
-            System.out.println(line);
+            while(line != null) {
+                if(!isError)
+                    System.out.println(line);
+                else
+                    System.err.println("e: " + line);
+
+                line = br.readLine();
+            }
         } catch (IOException e) {
             System.err.println("Error while reading process output.");
         }
+    }
+    public void readOutput(Process p) {
+        InputStream is = p.getInputStream();
+        InputStream is2 = p.getErrorStream();
+
+        this.inputString2String(is, false);
+        this.inputString2String(is2, true);
     }
     public static void main(String[] args) {
         Master m = new Master();
