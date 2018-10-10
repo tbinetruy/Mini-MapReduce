@@ -35,35 +35,41 @@ public class Deploy {
             }
         }
 
-        for(Process p : list_p) {
-            this.readOutput(p);
+        for(int i = 0; i < list_p.size(); i++) {
+            Process p = list_p.get(i);
+            String s = this.readOutput(p);
+            String currentMachine = list_m.get(i);
+            if(s.equals(currentMachine))
+                System.out.println(currentMachine + ": connection working.");
+            else
+                System.out.println("Error: " + currentMachine + ": connection NOT working.");
         }
     }
-    public void inputString2String(InputStream is, boolean isError) {
+    public String inputString2String(InputStream is, boolean isError) {
         BufferedInputStream bis = new BufferedInputStream(is);
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
 
+        String line = "";
         try {
-            String line = br.readLine();
-            while(line != null) {
-                if(!isError)
-                    System.out.println(line);
-                else
-                    System.err.println("e: " + line);
-
-                line = br.readLine();
-            }
+            line = br.readLine();
         } catch (IOException e) {
             System.err.println("Error while reading process output.");
         }
+
+        return line;
     }
-    public void readOutput(Process p) {
+    public String readOutput(Process p) {
         InputStream is = p.getInputStream();
         InputStream is2 = p.getErrorStream();
 
-        this.inputString2String(is, false);
-        this.inputString2String(is2, true);
+        String stdout = this.inputString2String(is, false);
+        String stderr = this.inputString2String(is2, true);
+
+        if(stderr != null)
+            return stderr;
+        else
+            return stdout;
     }
     public static void main(String[] args) {
         Deploy m = new Deploy();
