@@ -5,19 +5,37 @@ import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.lang.InterruptedException;
+import java.util.stream.Collectors;
+import java.util.Arrays;
 
 public class Deploy {
     public Deploy() {
         ArrayList<String> list_m = new ArrayList<>();
-        ArrayList<Process> list_p = new ArrayList<>();
         list_m.add("c133-07");
         list_m.add("c133-08");
-        list_m.add("c133-09");
+        list_m.add("c133-08888");
 
-        for(int i = 0; i < list_m.size(); i++) {
-            ProcessBuilder pb = new ProcessBuilder("ssh",
-                                                   "binetruy@" + list_m.get(i),
-                                                   "hostname");
+        ArrayList<String> arguments = list_m
+            .stream()
+            .map(m -> "ssh binetruy@" + m + " hostname")
+            .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Process> list_p = this.parallelizeProcesses("ssh", arguments);
+
+        for(int i = 0; i < list_p.size(); i++) {
+            Process p = list_p.get(i);
+            String s = this.readOutput(p);
+            String currentMachine = list_m.get(i);
+            if(s.equals(currentMachine))
+                System.out.println(currentMachine + ": connection working.");
+            else
+                System.err.println("Error: " + currentMachine + ": connection NOT working.");
+        }
+    }
+    public ArrayList<Process> parallelizeProcesses(String command, ArrayList<String> arguments) {
+        ArrayList<Process> list_p = new ArrayList<>();
+
+        for(int i = 0; i < arguments.size(); i++) {
+            ProcessBuilder pb = new ProcessBuilder(Arrays.asList(arguments.get(i).split(" ")));
 
             try {
                 Process p = pb.start();
@@ -35,15 +53,7 @@ public class Deploy {
             }
         }
 
-        for(int i = 0; i < list_p.size(); i++) {
-            Process p = list_p.get(i);
-            String s = this.readOutput(p);
-            String currentMachine = list_m.get(i);
-            if(s.equals(currentMachine))
-                System.out.println(currentMachine + ": connection working.");
-            else
-                System.out.println("Error: " + currentMachine + ": connection NOT working.");
-        }
+        return list_p;
     }
     public String inputString2String(InputStream is, boolean isError) {
         BufferedInputStream bis = new BufferedInputStream(is);
