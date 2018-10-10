@@ -15,23 +15,44 @@ public class Deploy {
         list_m.add("c133-08");
         list_m.add("c133-08888");
 
-        ArrayList<String> arguments = list_m
-            .stream()
+        ArrayList<String> list_working_m = this.getReachableMachines(list_m);
+        this.deploySlave(list_working_m);
+    }
+    public void deploySlave(ArrayList<String> list_m) {
+        ArrayList<String> arguments = list_m.stream()
+            .map(m -> "scp Slave.jar binetruy@" + m + ":/tmp/binetruy/")
+            .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Process> list_p = this.parallelizeProcesses(arguments);
+        for(int i = 0; i < list_m.size(); i++) {
+            Process p = list_p.get(i);
+            String s = this.readOutput(p);
+            if(s == null)
+                System.out.println(list_m.get(i) +  ": Deploy successful");
+            else
+                System.err.println(s);
+        }
+    }
+    public ArrayList<String> getReachableMachines(ArrayList<String> list_m) {
+        ArrayList<String> arguments = list_m.stream()
             .map(m -> "ssh binetruy@" + m + " hostname")
             .collect(Collectors.toCollection(ArrayList::new));
-        ArrayList<Process> list_p = this.parallelizeProcesses("ssh", arguments);
+        ArrayList<Process> list_p = this.parallelizeProcesses(arguments);
+        ArrayList<String> list_reachable_m = new ArrayList<>();
 
         for(int i = 0; i < list_p.size(); i++) {
             Process p = list_p.get(i);
             String s = this.readOutput(p);
             String currentMachine = list_m.get(i);
-            if(s.equals(currentMachine))
+            if(s.equals(currentMachine)) {
                 System.out.println(currentMachine + ": connection working.");
-            else
+                list_reachable_m.add(currentMachine);
+            } else
                 System.err.println("Error: " + currentMachine + ": connection NOT working.");
         }
+
+        return list_reachable_m;
     }
-    public ArrayList<Process> parallelizeProcesses(String command, ArrayList<String> arguments) {
+    public ArrayList<Process> parallelizeProcesses(ArrayList<String> arguments) {
         ArrayList<Process> list_p = new ArrayList<>();
 
         for(int i = 0; i < arguments.size(); i++) {
@@ -55,7 +76,7 @@ public class Deploy {
 
         return list_p;
     }
-    public String inputString2String(InputStream is, boolean isError) {
+    public String inputStream2String(InputStream is, boolean isError) {
         BufferedInputStream bis = new BufferedInputStream(is);
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
@@ -73,8 +94,8 @@ public class Deploy {
         InputStream is = p.getInputStream();
         InputStream is2 = p.getErrorStream();
 
-        String stdout = this.inputString2String(is, false);
-        String stderr = this.inputString2String(is2, true);
+        String stdout = this.inputStream2String(is, false);
+        String stderr = this.inputStream2String(is2, true);
 
         if(stderr != null)
             return stderr;
