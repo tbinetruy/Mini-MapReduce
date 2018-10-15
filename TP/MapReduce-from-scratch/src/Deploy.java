@@ -20,7 +20,7 @@ public class Deploy {
     }
     public void deploySlave(ArrayList<String> list_m) {
         ArrayList<String> arguments = list_m.stream()
-            .map(m -> "scp Slave.jar binetruy@" + m + ":/tmp/binetruy/")
+            .map(m -> "ssh binetruy@" + m + " mkdir -p /tmp/binetruy; scp Slave.jar binetruy@" + m + ":/tmp/binetruy/")
             .collect(Collectors.toCollection(ArrayList::new));
         ArrayList<Process> list_p = this.parallelizeProcesses(arguments);
         for(int i = 0; i < list_m.size(); i++) {
@@ -56,7 +56,7 @@ public class Deploy {
         ArrayList<Process> list_p = new ArrayList<>();
 
         for(int i = 0; i < arguments.size(); i++) {
-            ProcessBuilder pb = new ProcessBuilder(Arrays.asList(arguments.get(i).split(" ")));
+            ProcessBuilder pb = new ProcessBuilder("bash", "-c", arguments.get(i));
 
             try {
                 Process p = pb.start();
@@ -77,7 +77,6 @@ public class Deploy {
         return list_p;
     }
     public String inputStream2String(InputStream is, boolean isError) {
-        BufferedInputStream bis = new BufferedInputStream(is);
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
 
