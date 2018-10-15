@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.lang.InterruptedException;
 import java.util.concurrent.TimeUnit;
+import java.lang.IllegalThreadStateException;
 
 
 public class Master {
@@ -17,17 +18,18 @@ public class Master {
         ArrayList<String> list_m = new ArrayList<>();
         ArrayList<Process> list_p = new ArrayList<>();
         list_m.add("c133-07");
+        list_m.add("c133-08");
+        list_m.add("c133-09");
 
+        // start processes in parallel
         for(int i = 0; i < list_m.size(); i++) {
-            // ProcessBuilder pb = new ProcessBuilder("ssh",
-            //                                        "binetruy@" + list_m.get(i),
-            //                                        "java",
-            //                                        "-jar",
-            //                                        "/tmp/binetruy/Slave.jar");
-
-            ProcessBuilder pb = new ProcessBuilder("java",
+            ProcessBuilder pb = new ProcessBuilder("ssh",
+                                                   "binetruy@" + list_m.get(i),
+                                                   "java",
                                                    "-jar",
-                                                   "Slave.jar");
+                                                   "/tmp/binetruy/Slave.jar");
+
+            // ProcessBuilder pb = new ProcessBuilder("ls");
 
             try {
                 Process p = pb.start();
@@ -38,23 +40,40 @@ public class Master {
         }
 
         boolean wasProcessKilled = false;
-        for(Process p : list_p) {
+        ArrayList<Integer> killed_processes = new ArrayList<>();
+        long start = System.currentTimeMillis();
+        long end = start + 14000;
+        for(int i = 0; i < list_p.size(); i++) {
+            Process p = list_p.get(i);
+            long time = System.currentTimeMillis() - start;
             try {
-                boolean timeout = p.waitFor(15, TimeUnit.SECONDS);
-                if(!timeout) {
-                    System.err.println("Timeout, destroying process");
-                    p.destroy();
-                    wasProcessKilled = true;
+                long deltaT = (end - start) / 1000;
+                if(deltaT > 0) {
+                    boolean timeout = p.waitFor(deltaT, TimeUnit.SECONDS);
+                    if(!timeout) {
+                        this.destroyProcess(p, i, killed_processes);
+                    }
+                } else {
+                    // kill all other processes
+                    this.destroyProcess(p, i, killed_processes);
                 }
+                start = System.currentTimeMillis();
             } catch(InterruptedException e) {
                 System.err.println("An error has occurred while waiting for a process.");
             }
         }
 
-        for(Process p : list_p) {
-            if(!wasProcessKilled)
+        // Read output of not-timed-out processes
+        for(int i = 0; i < list_p.size(); i++) {
+            Process p = list_p.get(i);
+            if(!killed_processes.contains(i))
                 this.readOutput(p);
         }
+    }
+    public void destroyProcess(Process p, int i, ArrayList<Integer> killed_processes) {
+        System.err.println("Timeout, destroying process " + Integer.toString(i, 10));
+        p.destroy();
+        killed_processes.add(i);
     }
     public void inputString2String(InputStream is, boolean isError) {
         BufferedInputStream bis = new BufferedInputStream(is);
