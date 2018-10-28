@@ -94,6 +94,7 @@ public class Master {
         this.transferUMs(machineWordsMap, mapLocations);
     }
     void transferUMs(HashMap<String, HashMap<String, ArrayList<String>>> machineWordsLocation, HashMap<String, String> mapLocations) {
+        HashMap<String, ArrayList<String>> machinesToUMsNeeded = new HashMap<>();
         for(String machine: machineWordsLocation.keySet()) {
             ArrayList<String> UMs = new ArrayList<>();
             for(String word: machineWordsLocation.get(machine).keySet()) {
@@ -103,8 +104,22 @@ public class Master {
                     }
                 }
             }
+            machinesToUMsNeeded.put(machine, UMs);
             System.out.println(machine);
             System.out.println(UMs);
+        }
+
+        ArrayList<List<String>> cmds = new ArrayList<>();
+        for(String machineTo: machinesToUMsNeeded.keySet()) {
+            for(String UM: machinesToUMsNeeded.get(machineTo)) {
+                String machineFrom = mapLocations.get(UM);
+                List<String> cmd = new ArrayList<>();
+                String pushString = "ssh binetruy@" + machineFrom + " 'scp " + UM + " binetruy@" + machineTo + ":/tmp/binetruy/maps/'";
+                System.out.println(pushString);
+                cmd.add("bash");
+                cmd.add("-c");
+                cmd.add(pushString);
+            }
         }
     }
     void printKeyUMMap(HashMap<String, ArrayList<String>> map) {
