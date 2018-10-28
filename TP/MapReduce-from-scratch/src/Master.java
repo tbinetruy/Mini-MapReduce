@@ -26,7 +26,6 @@ public class Master {
         ArrayList<Process> list_p = this.startProcesses(list_m);
         ArrayList<Process> list_p_new = this.timeoutProcesses(list_p);
         this.readOutput(list_p_new);
-        System.out.println("finished");
     }
     public ArrayList<Process> startProcesses(ArrayList<String> list_m) {
         ArrayList<Process> list_p = new ArrayList<>();
@@ -60,7 +59,6 @@ public class Master {
                 long deltaT = (end - start) / 1000;
                 if(deltaT > 0) {
                     boolean timeout = p.waitFor(deltaT, TimeUnit.SECONDS);
-                    System.out.println("waiting");
                     if(!timeout) {
                         this.destroyProcess(p, i, killed_processes);
                     }
@@ -90,7 +88,7 @@ public class Master {
     }
     public void readOutput(ArrayList<Process> list_p) {
         for(Process p : list_p) {
-            h.readOutput(p);
+            System.out.println(h.readOutput(p));
         }
     }
     public static void main(String[] args) {
