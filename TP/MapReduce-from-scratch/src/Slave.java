@@ -109,6 +109,24 @@ public class Slave {
         }
         this.writeFile(lines, outputFile);
     }
+    void reduce(String key, String inputFile, String outputFile) {
+        int count = 0;
+        String fileContent = this.getFileContent(inputFile);
+        for(String line: fileContent.split("\n")) {
+            String word = line.split(" ")[0];
+            if(word.equals(key)) {
+                count++;
+            }
+        }
+
+
+        ArrayList<Line> lines = new ArrayList<>();
+        lines.add(new Line(key, count));
+
+        boolean success = this.createDirectory("/tmp/binetruy/reduces");
+        if(success)
+            this.writeFile(lines, outputFile);
+    }
     public static void main(String[] args) {
         Slave slave = new Slave();
         int mode = Integer.parseInt(args[0]);
@@ -123,6 +141,13 @@ public class Slave {
                 inputFiles.add(args[i]);
             }
             slave.shuffle(key, inputFiles, outputFile);
+        }
+        else if(mode == 2) {
+            String key = args[1];
+            String inputFile = args[2];
+            String outputFile = args[3];
+
+            slave.reduce(key, inputFile, outputFile);
         }
     }
 }
