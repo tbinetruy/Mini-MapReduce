@@ -15,6 +15,8 @@ import java.lang.IllegalThreadStateException;
 
 public class Master {
     public Master() {
+        Helpers h = new Helpers();
+
         ArrayList<String> list_m = new ArrayList<>();
         list_m.add("c133-07");
         list_m.add("c133-08");
