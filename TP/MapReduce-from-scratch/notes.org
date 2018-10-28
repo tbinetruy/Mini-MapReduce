@@ -1,0 +1,421 @@
+* Etape 2: travailler avec plusieurs ordinateurs en réseau.
+  
+** ​12​: Nom court, nom long
+   
+Quel est le nom COURT de votre ordinateur (le nom simple sans le domaine) ?   quel est le nom LONG de votre ordinateur (le nom avec le domaine) ? Comment les connaître en ligne de commande ? Sur les ordinateurs de l’école, est-il possible d’obtenir ces noms autrement qu’en ligne de commande ?
+
+#+begin_src sh
+ssh binetruy@c133-07 hostname
+#+end_src
+
+#+RESULTS:
+: c133-07
+
+#+begin_src sh
+ssh binetruy@c133-07 hostname --fqdn
+#+end_src
+
+#+RESULTS:
+: c133-07.enst.fr
+
+** 13: Adresse IP
+   
+Comment connaître les adresses (plusieurs) IP de votre ordinateur en ligne de commande ? Autrement (en passant par un site internet par exemple) ?
+
+#+begin_src sh
+ip addr
+#+end_src
+
+#+RESULTS:
+| 1:            | lo:                                    | <LOOPBACK,UP,LOWER_UP>              | mtu               |         65536 | qdisc         | noqueue  | state         | UNKNOWN | group | default | qlen | 1000 |
+| link/loopback | 00:00:00:00:00:00                      | brd                                 | 00:00:00:00:00:00 |               |               |          |               |         |       |         |      |      |
+| inet          | 127.0.0.1/8                            | scope                               | host              |            lo |               |          |               |         |       |         |      |      |
+| valid_lft     | forever                                | preferred_lft                       | forever           |               |               |          |               |         |       |         |      |      |
+| inet6         | ::1/128                                | scope                               | host              |               |               |          |               |         |       |         |      |      |
+| valid_lft     | forever                                | preferred_lft                       | forever           |               |               |          |               |         |       |         |      |      |
+| 2:            | wwp0s20u4:                             | <BROADCAST,MULTICAST,NOARP>         | mtu               |          1428 | qdisc         | noop     | state         | DOWN    | group | default | qlen | 1000 |
+| link/ether    | de:de:63:70:0d:bf                      | brd                                 | ff:ff:ff:ff:ff:ff |               |               |          |               |         |       |         |      |      |
+| 3:            | enp0s25:                               | <NO-CARRIER,BROADCAST,MULTICAST,UP> | mtu               |          1500 | qdisc         | fq_codel | state         | DOWN    | group | default | qlen | 1000 |
+| link/ether    | 68:f7:28:fa:8c:c7                      | brd                                 | ff:ff:ff:ff:ff:ff |               |               |          |               |         |       |         |      |      |
+| 4:            | wlp3s0:                                | <BROADCAST,MULTICAST,UP,LOWER_UP>   | mtu               |          1500 | qdisc         | mq       | state         | UP      | group | default | qlen | 1000 |
+| link/ether    | 5c:e0:c5:e7:c1:15                      | brd                                 | ff:ff:ff:ff:ff:ff |               |               |          |               |         |       |         |      |      |
+| inet          | 137.194.94.59/21                       | brd                                 | 137.194.95.255    |         scope | global        | dynamic  | noprefixroute | wlp3s0  |       |         |      |      |
+| valid_lft     | 2949sec                                | preferred_lft                       | 2949sec           |               |               |          |               |         |       |         |      |      |
+| inet6         | 2001:660:330f:16:7c2d:157:2eb8:3e07/64 | scope                               | global            |       dynamic | noprefixroute |          |               |         |       |         |      |      |
+| valid_lft     | 1800sec                                | preferred_lft                       | 60sec             |               |               |          |               |         |       |         |      |      |
+| inet6         | fe80::8b57:7e2f:73d4:c85f/64           | scope                               | link              | noprefixroute |               |          |               |         |       |         |      |      |
+| valid_lft     | forever                                | preferred_lft                       | forever           |               |               |          |               |         |       |         |      |      |
+
+** 14: Du nom vers l'IP
+   
+Comment à partir du nom d’un ordinateur, obtenir les adresses IP en ligne de commande ?
+
+#+begin_src sh
+nslookup c133-07
+#+end_src
+
+#+RESULTS:
+| Server:		137.194.2.16   |
+| Address:	137.194.2.16#53 |
+|                           |
+| Name:	c133-07.enst.fr    |
+| Address: 137.194.34.71    |
+
+** 15: De l'IP vers le nom
+   
+Comment, à partir d’une adresse IP, obtenir les noms associés en ligne de commande ?
+
+#+begin_src sh
+nslookup 137.194.34.71
+#+end_src
+
+#+RESULTS:
+| 71.34.194.137.in-addr.arpa | name = c133-07.enst.fr. |
+|                            |                         |
+
+** 16. Ping pong a l'interieur
+
+Testez la communication avec d’autres ordinateurs (pas le vôtre) depuis le réseau de l’école en utilisant la commande ping (pour arrêter le ping faire CTRL + C). suivi du nom court, du nom long, de l’IP. Les trois méthodes fonctionnent-elles ?
+
+#+begin_src sh
+ping -c 3 c133-07
+#+end_src
+
+#+RESULTS:
+| PING | c133-07.enst.fr  | (137.194.34.71) | 56(84)                  | bytes            | of         | data.  |            |      |     |
+|   64 | bytes            | from            | c133-07.enst.fr         | (137.194.34.71): | icmp_seq=1 | ttl=63 | time=0.896 | ms   |     |
+|   64 | bytes            | from            | c133-07.enst.fr         | (137.194.34.71): | icmp_seq=2 | ttl=63 | time=1.98  | ms   |     |
+|   64 | bytes            | from            | c133-07.enst.fr         | (137.194.34.71): | icmp_seq=3 | ttl=63 | time=1.99  | ms   |     |
+|      |                  |                 |                         |                  |            |        |            |      |     |
+|  --- | c133-07.enst.fr  | ping            | statistics              | ---              |            |        |            |      |     |
+|    3 | packets          | transmitted,    | 3                       | received,        | 0%         | packet | loss,      | time | 5ms |
+|  rtt | min/avg/max/mdev | =               | 0.896/1.619/1.985/0.513 | ms               |            |        |            |      |     |
+
+#+begin_src sh
+ping -c 3 c133-07.enst.fr
+#+end_src
+
+#+RESULTS:
+| PING | c133-07.enst.fr  | (137.194.34.71) | 56(84)                  | bytes            | of         | data.  |           |      |     |
+|   64 | bytes            | from            | c133-07.enst.fr         | (137.194.34.71): | icmp_seq=1 | ttl=63 | time=1.20 | ms   |     |
+|   64 | bytes            | from            | c133-07.enst.fr         | (137.194.34.71): | icmp_seq=2 | ttl=63 | time=1.84 | ms   |     |
+|   64 | bytes            | from            | c133-07.enst.fr         | (137.194.34.71): | icmp_seq=3 | ttl=63 | time=2.12 | ms   |     |
+|      |                  |                 |                         |                  |            |        |           |      |     |
+|  --- | c133-07.enst.fr  | ping            | statistics              | ---              |            |        |           |      |     |
+|    3 | packets          | transmitted,    | 3                       | received,        | 0%         | packet | loss,     | time | 6ms |
+|  rtt | min/avg/max/mdev | =               | 1.195/1.717/2.121/0.390 | ms               |            |        |           |      |     |
+
+#+begin_src sh
+ping -c 3 137.194.34.71
+#+end_src
+
+#+RESULTS:
+| PING | 137.194.34.71    | (137.194.34.71) |                  56(84) | bytes      | of     | data.      |       |      |     |
+|   64 | bytes            | from            |          137.194.34.71: | icmp_seq=1 | ttl=63 | time=1.79  | ms    |      |     |
+|   64 | bytes            | from            |          137.194.34.71: | icmp_seq=2 | ttl=63 | time=0.977 | ms    |      |     |
+|   64 | bytes            | from            |          137.194.34.71: | icmp_seq=3 | ttl=63 | time=1.14  | ms    |      |     |
+|      |                  |                 |                         |            |        |            |       |      |     |
+|  --- | 137.194.34.71    | ping            |              statistics | ---        |        |            |       |      |     |
+|    3 | packets          | transmitted,    |                       3 | received,  | 0%     | packet     | loss, | time | 5ms |
+|  rtt | min/avg/max/mdev | =               | 0.977/1.302/1.789/0.350 | ms         |        |            |       |      |     |
+
+** 18: Calculer en ligne de commande sur l’ordinateur local
+   
+Comment lancer un calcul en ligne de commande sur votre ordinateur (par exemple 2 + 3) ? Parmi les multiples réponses possibles, lesquelles permettent de lancer le calcul et d’obtenir le résultat en appuyant une seule fois sur la touche <Entrée> ?
+
+#+begin_src sh
+calc 4+2
+#+end_src
+
+#+RESULTS:
+|   | 6 |
+
+** 19: calculer en ligne de commande sur un ordinateur distant
+
+Comment lancer un calcul  (par exemple 2 + 3) en ligne de commande sur un autre ordinateur (à distance) ? Il faudra certainement vous authentifier avec un mot de passe. Comment obtenir le résultat du calcul immédiatement après avoir tapé son mot de passe ?
+
+
+#+begin_src sh
+ssh binetruy@c133-07 calc 4+2
+#+end_src
+
+#+RESULTS:
+|   | 6 |
+
+* Etape 3: travailler avec des fichiers locaux ou sur un serveur NFS.
+
+** 21 Chemin absolu
+   
+Quel est le chemin absolu de votre répertoire personnel, votre home directory ? (commandes “cd” puis ”pwd”)
+
+#+begin_src sh
+ssh binetruy@c133-07 pwd
+#+end_src
+
+#+RESULTS:
+: /cal/homes/binetruy
+
+** 22: Un fichier dans le répertoire personnel
+   
+Créez un fichier fperso.txt contenant le texte “bonjour” dans votre répertoire personnel (sur un ordinateur de l’école). Vérifiez le contenu du fichier avec cette commande exactement: ~cat ~/fperso.txt~
+
+#+begin_src sh
+ssh binetruy@c133-07 "echo \"bonjour\" > fperso.txt"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh
+ssh binetruy@c133-07 cat fperso.txt
+#+end_src
+
+#+RESULTS:
+: bonjour
+
+** 23: Ou se trouve le fichier dans le répertoire personnel
+   
+Ce fichier est-il sur le disque dur de l’ordinateur ou autre part ? Comment savoir où est stocké physiquement ce fichier, à l’aide de quelle commande ? 
+
+#+begin_src sh
+ssh binetruy@c133-07 df fperso.txt
+#+end_src
+
+#+RESULTS:
+| Sys.                                    |      de | fichiers |   blocs |  de | 1K                  | Utilisé | Disponible | Uti% | Monté | sur |
+| zfs-b232.enst.fr:/export/homes/binetruy | 3145728 |  2010112 | 1135616 | 64% | /cal/homes/binetruy |         |            |      |       |     |
+
+** 24: Un dossier et un fichier dans le répertoire temporaire
+   
+1. Créez un dossier /tmp/<votre nom d’utilisateur> en remplaçant <votre nom d’utilisateur>.
+2. Créez un fichier ftemp.txt dans le répertoire /tmp/<votre nom d’utilisateur> .
+3. Vérifiez le contenu du fichier avec cette commande exactement: ~cat /tmp/<votre nom d’utilisateur>/ftemp.txt~
+4. Ce dossier et ce fichier sont-ils sur le disque dur de l’ordinateur ou autre part ? Comment savoir où sont stockés physiquement ces éléments, à l’aide de quelle commande ?
+
+#+begin_src sh
+ssh binetruy@c133-07 mkdir /tmp/binetruy
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh
+ssh binetruy@c133-07 touch /tmp/binetruy/ftemp.txt
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh
+ssh binetruy@c133-07 cat /tmp/binetruy/ftemp.txt
+#+end_src
+
+#+RESULTS:
+
+
+#+begin_src sh
+ssh binetruy@c133-07 df /tmp/binetruy/ftemp.txt
+#+end_src
+
+#+RESULTS:
+| Sys.                  |      de | fichiers |   blocs | de | 1K   | Utilisé | Disponible | Uti% | Monté | sur |
+| /dev/mapper/vg-lv_tmp | 9545920 |    41920 | 8999376 | 1% | /tmp |         |            |      |       |     |
+
+
+** 25: Trois ordinateurs A B C. On commence avec A. Utilisation du serveur NFS.
+   
+1. Pour les questions suivantes, utilisez trois ordinateurs: A, B C.
+2. Connectez vous physiquement (avec un clavier, une souris et un écran) sur l’ordinateur A.
+3. Sur A, créez un fichier text.txt contenant le texte “mon texte sur NFS” dans votre répertoire personnel.
+4. Vérifiez que le fichier existe et vérifiez son contenu. Pour cela, sur A, utilisez la commande : ~cat ~/text.txt~
+
+#+begin_src sh
+ssh binetruy@c133-07 "echo \"mon texte sur NFS\" > ~/text.txt"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+HOST_A="c133-07"
+HOST_B="c133-08"
+HOST_C="c133-09"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "cat ~/text.txt"
+#+end_src
+
+#+RESULTS:
+: mon texte sur NFS
+
+
+** 26: Trois ordinateurs A B C. On continue sur B et sur C. Utilisation du serveur NFS.
+   
+1. Connectez-vous à B (physiquement ou à distance) et vérifiez que le fichier text.txt est également présent dans votre répertoire personnel. Pour cela, sur B, utilisez la commande :
+~cat ~/text.txt~
+2. De même, connectez-vous à C et vérifiez que text.txt est aussi présent.
+3. Remarquez que vous n’avez pas copié le fichier mais qu’il est présent sur A, B et C grâce au serveur NFS.
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_B "cat ~/text.txt"
+#+end_src
+
+#+RESULTS:
+: mon texte sur NFS
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_C "cat ~/text.txt"
+#+end_src
+
+#+RESULTS:
+: mon texte sur NFS
+
+** 27: Trois ordinateurs A B C. On commence avec A. Utilisation des disques locaux.
+   
+1. Déconnectez vous de B et de C et revenez sur l’ordinateur A.
+2. Sur A, créez un dossier ~/tmp/<votre nom d’utilisateur>~ et un fichier ~local.txt~ contenant le texte “mon texte sur disque local” dans ce dossier ~/tmp/<votre nom d’utilisateur>~.
+3. Vérifiez que le fichier existe et vérifiez son contenu. Pour cela, sur A, utilisez la commande : ~cat /tmp/<votre nom d’utilisateur>/local.txt~
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "echo \"mon texte sur disque local\" > /tmp/binetruy/local.txt"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "cat /tmp/binetruy/local.txt"
+#+end_src
+
+#+RESULTS:
+: mon texte sur disque local
+
+** 28: Trois ordinateurs A B C. On continue sur B et sur C. Utilisation des disques locaux.
+   
+Connectez-vous à B et C (physiquement ou à distance) et vérifiez que le dossier ~<votre nom d’utilisateur>~ ainsi que le fichier ~local.txt~ ne sont pas présent dans ~/tmp~. Pour cela vérifiez avec la commande: ~ls /tmp~
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_B "ls /tmp | grep binetruy"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_C "ls /tmp | grep binetruy"
+#+end_src
+
+#+RESULTS:
+
+** 29: Depuis A, copier de A vers B avec les disques locaux.
+   
+Comment, à partir de A, transférer le fichier ~/tmp/local.txt~ sur B (dans ~/tmp/<votre nom d’utilisateur>/local.txt~) en utilisant ~scp~ ? Vérifiez que le fichier est bien présent sur B. Attention: si vous avez une erreur “no such file or directory” (ou l’équivalent français), vous devez d’abord créer le répertoire ~/tmp/<votre nom d’utilisateur>/~ avec la commande ~mkdir -p~ associée à un ssh pour l’ordinateur distant.
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_B "mkdir /tmp/binetruy"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "scp /tmp/binetruy/local.txt binetruy@$HOST_B:/tmp/binetruy/"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_B "cat /tmp/binetruy/local.txt"
+#+end_src
+
+#+RESULTS:
+: mon texte sur disque local
+
+** 30: Depuis A, copier de B vers C avec les disques locaux.
+   
+Comment, à partir de A, transférer le fichier de B (depuis ~/tmp/<votre nom d’utilisateur>/local.txt~) vers C (dans ~/tmp/<votre nom d’utilisateur>/local.txt~) ? Vérifiez que le fichier est bien présent sur C. De même que la question précédentes, vous devez créer les répertoires ~/tmp/<votre nom d’utilisateur>/~ correspondants.
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_C "mkdir /tmp/binetruy"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "scp binetruy@$HOST_B:/tmp/binetruy/local.txt binetruy@$HOST_C:/tmp/binetruy/"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_C "cat /tmp/binetruy/local.txt"
+#+end_src
+
+#+RESULTS:
+: mon texte sur disque local
+
+* Etape 4: lancer des programmes java à distance manuellement.
+  
+** 32: Exporter un JAR
+
+#+begin_src sh :session tp
+jar cmf Slave.mf Slave.jar Slave.class Slave.java
+#+end_src
+
+#+RESULTS:
+
+** 33: Exécution sur disque dur local
+   
+1. Créez le répertoire ~/tmp/<votre nom d’utilisateur>/~
+2. Copiez  slave.jar exécutable dans le répertoire ~/tmp/<votre nom d’utilisateur>/~
+3. Testez et Lancer le ~slave.jar~ en ligne de commande sur votre ordinateur local.
+
+#+begin_src sh :session tp
+scp ~/Documents/Telecom/cours/systemes\ repartis\ \(INF727\)/TP/TP1/src/Slave.jar binetruy@$HOST_A:/tmp/binetruy/
+#+end_src
+
+
+#+RESULTS:
+|                                                                                                        |
+| 0     0.0KB/s   --:-- ETASlave.jar                                     100%  984   172.4KB/s   00:00 |
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A java -jar /tmp/binetruy/Slave.jar
+#+end_src
+
+#+RESULTS:
+: 3
+
+** 34: Copie du JAR et exécution distante
+   
+1. Depuis la machine A contenant ~/tmp/<votre nom d’utilisateur>/slave.jar~
+2. Créez à distance sur la machine B (s’il n’existe pas) un répertoire ~/tmp/<votre nom d’utilisateur>/~
+3. Copiez ~slave.jar~ sur la machine B dans le répertoire ~/tmp/<votre nom d’utilisateur>/~
+4. Exécutez à distance (depuis A sur la machine B) le ~slave.jar~.
+5. Quelle est la commande tapée pour effectuer cette dernière action ?
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_B mkdir /tmp/binetruy/
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "scp /tmp/binetruy/Slave.jar binetruy@$HOST_B:/tmp/binetruy/"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :session tp
+ssh binetruy@$HOST_A "ssh binetruy@$HOST_B java -jar /tmp/binetruy/Slave.jar"
+#+end_src
+
+#+RESULTS:
+: 3
+
+* Etape 5: lancer des programmes en ligne de commande depuis java et afficher la sortie standard et la sortie d’erreur.
+  
+
+** 35: Un programme MASTER java qui lance un autre programme en ligne de commande!
+   
+Ecrire un programme java nommé “MASTER” qui lance la commande suivante en utilisant ProcessBuilder: ~ls -al /tmp~ (vous pouvez aussi tester cette commande dans un terminal avant)
+
+Récupérer et afficher la sortie de cette commande.
+
+Vous devez utiliser ProcessBuilder de cette façon: ~ProcessBuilder pb = new ProcessBuilder("ls", “-al”, “/tmp”);~
