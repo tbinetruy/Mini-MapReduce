@@ -1,0 +1,14 @@
+* Building
+
+#+begin_src bash
+./build.sh Master
+./build.sh Deploy
+./build.sh Slave
+#+end_src
+
+* Running
+  
+#+begin_src bash
+./run.sh Deploy
+./run.sh Master
+#+end_src
