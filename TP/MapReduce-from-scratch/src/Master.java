@@ -12,24 +12,67 @@ import java.io.IOException;
 import java.lang.InterruptedException;
 import java.lang.IllegalThreadStateException;
 import java.util.HashMap;
+import java.util.Arrays;
 
 
 public class Master {
     Helpers h;
+    ArrayList<String> list_m;
     public Master() {
         this.h = new Helpers();
 
-        ArrayList<String> list_m = new ArrayList<>();
-        list_m.add("c133-07");
-        list_m.add("c133-08");
-        list_m.add("c133-09");
+        this.list_m = new ArrayList<>();
+        this.list_m.add("c133-07");
+        this.list_m.add("c133-08");
+        this.list_m.add("c133-09");
 
-        HashMap<String, String> splitLocations = this.deploySplits(list_m);
+        HashMap<String, String> splitLocations = this.deploySplits(this.list_m);
 
-        ArrayList<Process> list_p = this.runSlaves(splitLocations);
+        HashMap<String, Process> slavesLocationMap = this.runSlaves(splitLocations);
+        ArrayList<Process> list_p = new ArrayList<>();
+        for(String key: slavesLocationMap.keySet()) {
+            list_p.add(slavesLocationMap.get(key));
+        }
+
         ArrayList<Process> list_p_success = h.timeoutProcesses(list_p);
-        this.readOutput(list_p_success);
+        HashMap<String, ArrayList<String>> keyUMMap = this.getKeyUMMap(slavesLocationMap);
+        this.printKeyUMMap(keyUMMap);
         this.getMapLocations(splitLocations);
+    }
+    void printKeyUMMap(HashMap<String, ArrayList<String>> map) {
+        for(String key: map.keySet()) {
+            String str = key + " - < ";
+            for(String UM: map.get(key)) {
+                str = str.concat(UM).concat(" ");
+            }
+            str = str.concat(">").replace("\n", " ");
+            System.out.println(str);
+        }
+    }
+    HashMap<String, ArrayList<String>> getKeyUMMap(HashMap<String, Process> map) {
+        HashMap<String, ArrayList<String>> UMKeyMap = new HashMap<>();
+        for(String key: map.keySet()) {
+            ArrayList<Process> list_p = new ArrayList<>();
+            list_p.add(map.get(key));
+            System.out.println(key);
+            ArrayList<String> outputs = new ArrayList<String>(Arrays.asList(this.readOutput(list_p).get(0).split("\n")));
+            UMKeyMap.put(key, outputs);
+        }
+
+        HashMap<String, ArrayList<String>> keyUMMap = new HashMap<>();
+        for(String UM: UMKeyMap.keySet()) {
+            for(String word: UMKeyMap.get(UM)) {
+                if(keyUMMap.get(word) == null) {
+                    ArrayList<String> UMList = new ArrayList<>();
+                    UMList.add(UM.replace("/S", "/UM"));
+                    keyUMMap.put(word, UMList);
+                } else {
+                    keyUMMap.get(word).add(UM.replace("/S", "/UM"));
+                }
+            }
+        }
+
+        return keyUMMap;
     }
     void getMapLocations(HashMap<String, String> splitLocations) {
         HashMap<String, String> mapLocations = new HashMap<>();
@@ -55,39 +98,49 @@ public class Master {
             cmds.add("-c");
             cmds.add(cmd);
             arguments.add(cmds);
-            System.out.println(cmds);
             splitLocations.put("/tmp/binetruy/splits/" + splitName, machine);
         }
 
         ArrayList<Process> list_p = h.parallelizeProcesses(arguments);
         h.waitForProcesses(list_p);
-        this.readOutput(list_p);
 
         return splitLocations;
     }
-    public ArrayList<Process> runSlaves(HashMap<String, String> splitLocations) {
-        ArrayList<Process> list_p = new ArrayList<>();
+    public HashMap<String, Process> runSlaves(HashMap<String, String> splitLocations) {
         ArrayList<List<String>> arguments = new ArrayList<>();
 
         // start processes in parallel
+        ArrayList<String> list_m = new ArrayList<>();
         for(String splitName: splitLocations.keySet()) {
             List<String> l = new ArrayList<>();
+            String machineName = splitLocations.get(splitName);
             l.add("ssh");
-            l.add("binetruy@" + splitLocations.get(splitName));
+            l.add("binetruy@" + machineName);
             l.add("java");
             l.add("-jar");
             l.add("/tmp/binetruy/Slave.jar");
             l.add("0");
             l.add(splitName);
             arguments.add(l);
+            list_m.add(splitName);
         }
 
-        return h.parallelizeProcesses(arguments);
-    }
-    public void readOutput(ArrayList<Process> list_p) {
-        for(Process p : list_p) {
-            System.out.println(h.readOutput(p));
+        ArrayList<Process> list_p = h.parallelizeProcesses(arguments);
+        HashMap<String, Process> slaveProcessLocation = new HashMap<>();
+        for(int i = 0; i < list_m.size(); i++) {
+            slaveProcessLocation.put(list_m.get(i), list_p.get(i));
         }
+
+        return slaveProcessLocation;
+    }
+    public ArrayList<String> readOutput(ArrayList<Process> list_p) {
+        ArrayList<String> outputs = new ArrayList<>();
+        for(Process p : list_p) {
+            String output = h.readOutput(p);
+            outputs.add(output);
+        }
+
+        return outputs;
     }
     public static void main(String[] args) {
         Master m = new Master();
