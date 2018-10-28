@@ -25,7 +25,7 @@ public class Helpers {
 
         for(int i = 0; i < list_p.size(); i++) {
             Process p = list_p.get(i);
-            String s = this.readOutput(p);
+            String s = this.readOutput(p).split("\n")[0];
             String currentMachine = list_m.get(i);
             if(s.equals(currentMachine)) {
                 System.out.println(currentMachine + ": connection working.");
@@ -72,14 +72,19 @@ public class Helpers {
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
 
-        String line = "";
+        String content = "";
         try {
-            line = br.readLine();
+            String line = br.readLine();
+            while (line != null) {
+                System.out.println(line);
+                content = content.concat(line) + "\n";
+                line = br.readLine();
+            }
         } catch (IOException e) {
             System.err.println("Error while reading process output.");
         }
 
-        return line;
+        return content;
     }
     public String readOutput(Process p) {
         InputStream is = p.getInputStream();
@@ -88,7 +93,7 @@ public class Helpers {
         String stdout = this.inputStream2String(is, false);
         String stderr = this.inputStream2String(is2, true);
 
-        if(stderr != null)
+        if(stderr != null && stderr != "")
             return stderr;
         else
             return stdout;
