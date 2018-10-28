@@ -16,11 +16,16 @@ import java.lang.IllegalThreadStateException;
 public class Master {
     public Master() {
         ArrayList<String> list_m = new ArrayList<>();
-        ArrayList<Process> list_p = new ArrayList<>();
         list_m.add("c133-07");
         list_m.add("c133-08");
         list_m.add("c133-09");
 
+        ArrayList<Process> list_p = this.startProcesses(list_m);
+        ArrayList<Integer> killed_processes = this.timeoutProcesses(list_p);
+        this.readOutput(list_p, killed_processes);
+    }
+    public ArrayList<Process> startProcesses(ArrayList<String> list_m) {
+        ArrayList<Process> list_p = new ArrayList<>();
         // start processes in parallel
         for(int i = 0; i < list_m.size(); i++) {
             ProcessBuilder pb = new ProcessBuilder("ssh",
@@ -28,8 +33,6 @@ public class Master {
                                                    "java",
                                                    "-jar",
                                                    "/tmp/binetruy/Slave.jar");
-
-            // ProcessBuilder pb = new ProcessBuilder("ls");
 
             try {
                 Process p = pb.start();
@@ -39,6 +42,9 @@ public class Master {
             }
         }
 
+        return list_p;
+    }
+    public ArrayList<Integer> timeoutProcesses(ArrayList<Process> list_p) {
         boolean wasProcessKilled = false;
         ArrayList<Integer> killed_processes = new ArrayList<>();
         long start = System.currentTimeMillis();
@@ -63,12 +69,7 @@ public class Master {
             }
         }
 
-        // Read output of not-timed-out processes
-        for(int i = 0; i < list_p.size(); i++) {
-            Process p = list_p.get(i);
-            if(!killed_processes.contains(i))
-                this.readOutput(p);
-        }
+        return killed_processes;
     }
     public void destroyProcess(Process p, int i, ArrayList<Integer> killed_processes) {
         System.err.println("Timeout, destroying process " + Integer.toString(i, 10));
@@ -94,7 +95,15 @@ public class Master {
             System.err.println("Error while reading process output.");
         }
     }
-    public void readOutput(Process p) {
+    public void readOutput(ArrayList<Process> list_p, ArrayList<Integer> killed_processes) {
+        // Read output of not-timed-out processes
+        for(int i = 0; i < list_p.size(); i++) {
+            Process p = list_p.get(i);
+            if(!killed_processes.contains(i))
+                this.readProcessOutput(p);
+        }
+    }
+    public void readProcessOutput(Process p) {
         InputStream is = p.getInputStream();
         InputStream is2 = p.getErrorStream();
 
