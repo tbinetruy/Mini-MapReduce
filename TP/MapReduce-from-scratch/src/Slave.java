@@ -91,11 +91,38 @@ public class Slave {
 
         return successful_p.get(0) == list_p.get(0);
     }
+    void shuffle(String key, ArrayList<String> inputFiles, String outputFile) {
+        int count = 0;
+        for(String file: inputFiles) {
+            String fileContent = this.getFileContent(file);
+            for(String line: fileContent.split("\n")) {
+                String word = line.split(" ")[0];
+                if(word.equals(key)) {
+                    count++;
+                }
+            }
+        }
+
+        ArrayList<Line> lines = new ArrayList<>();
+        for(int i = 0; i < count; i++) {
+            lines.add(new Line(key, 1));
+        }
+        this.writeFile(lines, outputFile);
+    }
     public static void main(String[] args) {
         Slave slave = new Slave();
         int mode = Integer.parseInt(args[0]);
         if(mode == 0) {
             slave.map(args[1]);
+        }
+        else if(mode == 1) {
+            String key = args[1];
+            String outputFile = args[2];
+            ArrayList<String> inputFiles = new ArrayList<>();
+            for(int i = 3; i < args.length; i++) {
+                inputFiles.add(args[i]);
+            }
+            slave.shuffle(key, inputFiles, outputFile);
         }
     }
 }
