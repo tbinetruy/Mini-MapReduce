@@ -20,8 +20,6 @@ public class Deploy {
         this.deploySlave(list_working_m);
     }
     public void deploySlave(ArrayList<String> list_m) {
-
-
         ArrayList<List<String>> arguments = new ArrayList<>();
         for(String m: list_m) {
             String cmd = "ssh binetruy@" + m + " mkdir -p /tmp/binetruy; scp Slave.jar binetruy@" + m + ":/tmp/binetruy/";
@@ -33,6 +31,7 @@ public class Deploy {
         }
 
         ArrayList<Process> list_p = h.parallelizeProcesses(arguments);
+        h.waitForProcesses(list_p);
 
         for(int i = 0; i < list_m.size(); i++) {
             Process p = list_p.get(i);

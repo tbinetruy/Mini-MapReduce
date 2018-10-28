@@ -52,8 +52,6 @@ public class Helpers {
             }
         }
 
-        this.waitForProcesses(list_p);
-
         return list_p;
     }
     public void waitForProcesses(ArrayList<Process> list_p) {
