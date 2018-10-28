@@ -91,6 +91,21 @@ public class Master {
             }
         }
 
+        this.transferUMs(machineWordsMap, mapLocations);
+    }
+    void transferUMs(HashMap<String, HashMap<String, ArrayList<String>>> machineWordsLocation, HashMap<String, String> mapLocations) {
+        for(String machine: machineWordsLocation.keySet()) {
+            ArrayList<String> UMs = new ArrayList<>();
+            for(String word: machineWordsLocation.get(machine).keySet()) {
+                for(String UM: machineWordsLocation.get(machine).get(word)) {
+                    if(!UMs.contains(UM)) {
+                        UMs.add(UM);
+                    }
+                }
+            }
+            System.out.println(machine);
+            System.out.println(UMs);
+        }
     }
     void printKeyUMMap(HashMap<String, ArrayList<String>> map) {
         for(String key: map.keySet()) {
