@@ -23,25 +23,29 @@ public class Slave {
         this.h = new Helpers();
     }
     public void map(String filename) {
-        System.out.println(filename);
-
         String fileContent = this.getFileContent(filename);
         String[] content = fileContent
             .replace("\n", " ")
             .split(" ");
 
         ArrayList<Line> mapping = new ArrayList<>();
-        for(String s: content) {
-            Line l = new Line(s, new Integer(1));
+        ArrayList<String> keys = new ArrayList<>();
+        for(String key: content) {
+            Line l = new Line(key, new Integer(1));
             mapping.add(l);
+            if(!keys.contains(key)) {
+                keys.add(key);
+            }
         }
-        System.out.println(mapping.get(0).word);
 
         boolean success = this.createDirectory("/tmp/binetruy/maps");
         String absoluteSplitPath = "/tmp/binetruy/splits/";
         if(success) {
             String filePath = "/tmp/binetruy/maps/UM" + filename.substring(absoluteSplitPath.length() + 1);
             this.writeFile(mapping, filePath);
+            for(String key: keys) {
+                System.out.println(key);
+            }
         }
     }
     boolean writeFile(ArrayList<Line> content, String filePath) {
