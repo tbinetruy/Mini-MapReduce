@@ -42,6 +42,8 @@ public class Master {
         System.out.println("Phase de MAP terminée.");
 
         this.prepareShuffle(mapLocations, keyUMMap, list_m);
+
+        System.out.println("Phase de préparation du SHUFFLE terminée.");
     }
     void prepareShuffle(HashMap<String, String> mapLocations, HashMap<String, ArrayList<String>> keyUMMap, ArrayList<String> list_m) {
         /*
@@ -116,10 +118,16 @@ public class Master {
                 List<String> cmd = new ArrayList<>();
                 String pushString = "ssh binetruy@" + machineFrom + " 'scp " + UM + " binetruy@" + machineTo + ":/tmp/binetruy/maps/'";
                 System.out.println(pushString);
-                cmd.add("bash");
-                cmd.add("-c");
-                cmd.add(pushString);
+                cmd.add("ssh");
+                cmd.add("binetruy@" + machineFrom);
+                cmd.add("scp " + UM + " binetruy@" + machineTo + ":/tmp/binetruy/maps/");
+                cmds.add(cmd);
             }
+        }
+        ArrayList<Process> list_p = h.parallelizeProcesses(cmds);
+        h.waitForProcesses(list_p);
+        for(Process p: list_p) {
+            h.readOutput(p);
         }
     }
     void printKeyUMMap(HashMap<String, ArrayList<String>> map) {
