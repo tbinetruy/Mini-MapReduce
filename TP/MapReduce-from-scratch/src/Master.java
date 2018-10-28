@@ -41,11 +41,53 @@ public class Master {
 
         System.out.println("Phase de MAP terminée.");
 
-        this.prepareShuffle(mapLocations, keyUMMap, list_m);
+        HashMap<String, HashMap<String, ArrayList<String>>> machineWordsMap =
+            this.prepareShuffle(mapLocations, keyUMMap, list_m);
 
         System.out.println("Phase de préparation du SHUFFLE terminée.");
+
+        this.requestSlaveShuffle(machineWordsMap);
+
+        System.out.println("Phase du SHUFFLE terminée.");
+
     }
-    void prepareShuffle(HashMap<String, String> mapLocations, HashMap<String, ArrayList<String>> keyUMMap, ArrayList<String> list_m) {
+    void requestSlaveShuffle(HashMap<String, HashMap<String, ArrayList<String>>> machineWordsMap) {
+        ArrayList<List<String>> cmds = new ArrayList<>();
+        for(String machine: machineWordsMap.keySet()) {
+            int counter = 0;
+            for(String word: machineWordsMap.get(machine).keySet()) {
+                List<String> cmd = new ArrayList<>();
+                cmd.add("ssh");
+                cmd.add("binetruy@" + machine);
+                cmd.add("java");
+                cmd.add("-jar");
+                cmd.add("/tmp/binetruy/Slave.jar");
+                cmd.add("1");
+                cmd.add(word);
+                cmd.add("/tmp/binetruy/maps/SM" + Integer.toString(counter) + ".txt");
+
+                for(String UM: machineWordsMap.get(machine).get(word)) {
+                    cmd.add(UM);
+                }
+                System.out.println(cmd);
+
+                cmds.add(cmd);
+
+                counter++;
+            }
+        }
+
+        ArrayList<Process> list_p = h.parallelizeProcesses(cmds);
+        h.waitForProcesses(list_p);
+        for(Process p: list_p) {
+            h.readOutput(p);
+        }
+    }
+    HashMap<String, HashMap<String, ArrayList<String>>> prepareShuffle(
+        HashMap<String, String> mapLocations,
+        HashMap<String, ArrayList<String>> keyUMMap,
+        ArrayList<String> list_m
+    ) {
         /*
           keyUMMap:
             Car - < /tmp/binetruy/splits/UM1.txt /tmp/binetruy/splits/UM2.txt >
@@ -94,6 +136,8 @@ public class Master {
         }
 
         this.transferUMs(machineWordsMap, mapLocations);
+
+        return machineWordsMap;
     }
     void transferUMs(HashMap<String, HashMap<String, ArrayList<String>>> machineWordsLocation, HashMap<String, String> mapLocations) {
         HashMap<String, ArrayList<String>> machinesToUMsNeeded = new HashMap<>();
