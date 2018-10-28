@@ -14,8 +14,9 @@ import java.lang.IllegalThreadStateException;
 
 
 public class Master {
+    Helpers h;
     public Master() {
-        Helpers h = new Helpers();
+        this.h = new Helpers();
 
         ArrayList<String> list_m = new ArrayList<>();
         list_m.add("c133-07");
@@ -23,8 +24,9 @@ public class Master {
         list_m.add("c133-09");
 
         ArrayList<Process> list_p = this.startProcesses(list_m);
-        ArrayList<Integer> killed_processes = this.timeoutProcesses(list_p);
-        this.readOutput(list_p, killed_processes);
+        ArrayList<Process> list_p_new = this.timeoutProcesses(list_p);
+        this.readOutput(list_p_new);
+        System.out.println("finished");
     }
     public ArrayList<Process> startProcesses(ArrayList<String> list_m) {
         ArrayList<Process> list_p = new ArrayList<>();
@@ -46,7 +48,7 @@ public class Master {
 
         return list_p;
     }
-    public ArrayList<Integer> timeoutProcesses(ArrayList<Process> list_p) {
+    public ArrayList<Process> timeoutProcesses(ArrayList<Process> list_p) {
         boolean wasProcessKilled = false;
         ArrayList<Integer> killed_processes = new ArrayList<>();
         long start = System.currentTimeMillis();
@@ -58,6 +60,7 @@ public class Master {
                 long deltaT = (end - start) / 1000;
                 if(deltaT > 0) {
                     boolean timeout = p.waitFor(deltaT, TimeUnit.SECONDS);
+                    System.out.println("waiting");
                     if(!timeout) {
                         this.destroyProcess(p, i, killed_processes);
                     }
@@ -71,46 +74,24 @@ public class Master {
             }
         }
 
-        return killed_processes;
+        ArrayList<Process> list_p_new = new ArrayList<>();
+        for(int i = 0; i < list_p.size(); i++) {
+            if(!killed_processes.contains(i)) {
+                list_p_new.add(list_p.get(i));
+            }
+        }
+
+        return list_p_new;
     }
     public void destroyProcess(Process p, int i, ArrayList<Integer> killed_processes) {
         System.err.println("Timeout, destroying process " + Integer.toString(i, 10));
         p.destroy();
         killed_processes.add(i);
     }
-    public void inputString2String(InputStream is, boolean isError) {
-        BufferedInputStream bis = new BufferedInputStream(is);
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-
-        try {
-            String line = br.readLine();
-            while(line != null) {
-                if(!isError)
-                    System.out.println(line);
-                else
-                    System.err.println("e: " + line);
-
-                line = br.readLine();
-            }
-        } catch (IOException e) {
-            System.err.println("Error while reading process output.");
+    public void readOutput(ArrayList<Process> list_p) {
+        for(Process p : list_p) {
+            h.readOutput(p);
         }
-    }
-    public void readOutput(ArrayList<Process> list_p, ArrayList<Integer> killed_processes) {
-        // Read output of not-timed-out processes
-        for(int i = 0; i < list_p.size(); i++) {
-            Process p = list_p.get(i);
-            if(!killed_processes.contains(i))
-                this.readProcessOutput(p);
-        }
-    }
-    public void readProcessOutput(Process p) {
-        InputStream is = p.getInputStream();
-        InputStream is2 = p.getErrorStream();
-
-        this.inputString2String(is, false);
-        this.inputString2String(is2, true);
     }
     public static void main(String[] args) {
         Master m = new Master();
