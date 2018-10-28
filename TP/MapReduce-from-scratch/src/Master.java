@@ -37,9 +37,60 @@ public class Master {
         ArrayList<Process> list_p_success = h.timeoutProcesses(list_p);
         HashMap<String, ArrayList<String>> keyUMMap = this.getKeyUMMap(slavesLocationMap);
         this.printKeyUMMap(keyUMMap);
-        this.getMapLocations(splitLocations);
+        HashMap<String, String> mapLocations = this.getMapLocations(splitLocations);
 
         System.out.println("Phase de MAP terminée.");
+
+        this.prepareShuffle(mapLocations, keyUMMap, list_m);
+    }
+    void prepareShuffle(HashMap<String, String> mapLocations, HashMap<String, ArrayList<String>> keyUMMap, ArrayList<String> list_m) {
+        /*
+          keyUMMap:
+            Car - < /tmp/binetruy/splits/UM1.txt /tmp/binetruy/splits/UM2.txt >
+            River - < /tmp/binetruy/splits/UM0.txt /tmp/binetruy/splits/UM1.txt >
+            Deer - < /tmp/binetruy/splits/UM0.txt /tmp/binetruy/splits/UM2.txt >
+            Beer - < /tmp/binetruy/splits/UM0.txt /tmp/binetruy/splits/UM2.txt >
+
+          mapLocations:
+            /tmp/binetruy/maps/UM0.txt - c133-07
+            /tmp/binetruy/maps/UM1.txt - c133-08
+            /tmp/binetruy/maps/UM2.txt - c133-09
+
+          result:
+            Machine 1:
+              Car: UM1, UM2
+              Beer: UM0, UM2
+              ==> UM0, UM1, UM2
+            Machine 2:
+              River: UM0, UM1
+            Machine 3:
+              Deer: UM0, UM2
+         */
+        HashMap<String, HashMap<String, ArrayList<String>>> machineWordsMap = new HashMap<>();
+        int counter = 0;
+        for(String word: keyUMMap.keySet()) {
+            String machineName = list_m.get(counter % list_m.size());
+            counter++;
+            HashMap<String, ArrayList<String>> wordUMsMap = new HashMap<>();
+            ArrayList<String> UMList = keyUMMap.get(word);
+            wordUMsMap.put(word, UMList);
+            if(machineWordsMap.containsKey(machineName)) {
+                machineWordsMap.get(machineName).put(word, UMList);
+            } else {
+                machineWordsMap.put(machineName, wordUMsMap);
+            }
+        }
+
+        for(String machine: machineWordsMap.keySet()) {
+            System.out.println(machine);
+            for(String word: machineWordsMap.get(machine).keySet()) {
+                System.out.println(word);
+                for(String UM: machineWordsMap.get(machine).get(word)) {
+                    System.out.println(UM);
+                }
+            }
+        }
+
     }
     void printKeyUMMap(HashMap<String, ArrayList<String>> map) {
         for(String key: map.keySet()) {
@@ -76,7 +127,7 @@ public class Master {
 
         return keyUMMap;
     }
-    void getMapLocations(HashMap<String, String> splitLocations) {
+    HashMap<String, String> getMapLocations(HashMap<String, String> splitLocations) {
         HashMap<String, String> mapLocations = new HashMap<>();
         for(String splitname: splitLocations.keySet()) {
             String absolutePath = "/tmp/binetruy/splits/";
@@ -84,6 +135,7 @@ public class Master {
             mapLocations.put(mapname, splitLocations.get(splitname));
             System.out.println(mapname + " - " + splitLocations.get(splitname));
         }
+        return mapLocations;
     }
     public HashMap<String, String> deploySplits(ArrayList<String> list_m) {
         ArrayList<String> list_working_m = h.getReachableMachines(list_m);
