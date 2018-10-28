@@ -38,6 +38,8 @@ public class Master {
         HashMap<String, ArrayList<String>> keyUMMap = this.getKeyUMMap(slavesLocationMap);
         this.printKeyUMMap(keyUMMap);
         this.getMapLocations(splitLocations);
+
+        System.out.println("Phase de MAP terminée.");
     }
     void printKeyUMMap(HashMap<String, ArrayList<String>> map) {
         for(String key: map.keySet()) {
