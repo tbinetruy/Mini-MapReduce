@@ -23,11 +23,34 @@ public class Master {
         list_m.add("c133-08");
         list_m.add("c133-09");
 
-        ArrayList<Process> list_p = this.startProcesses(list_m);
-        ArrayList<Process> list_p_new = h.timeoutProcesses(list_p);
-        this.readOutput(list_p_new);
+        this.deploySplits(list_m);
+
+        //ArrayList<Process> list_p = this.runSlaves(list_m);
+        //ArrayList<Process> list_p_new = h.timeoutProcesses(list_p);
+        //this.readOutput(list_p_new);
+
     }
-    public ArrayList<Process> startProcesses(ArrayList<String> list_m) {
+    public void deploySplits(ArrayList<String> list_m) {
+        ArrayList<String> list_working_m = h.getReachableMachines(list_m);
+
+        ArrayList<List<String>> arguments = new ArrayList<>();
+        int i = 0;
+        for(String m: list_working_m) {
+            String cmd = "ssh binetruy@" + m + " mkdir -p /tmp/binetruy/splits; scp S" + i + ".txt binetruy@" + m + ":/tmp/binetruy/splits/";
+            List<String> cmds = new ArrayList<String>();
+            cmds.add("bash");
+            cmds.add("-c");
+            cmds.add(cmd);
+            arguments.add(cmds);
+            i++;
+            System.out.println(cmds);
+        }
+
+        ArrayList<Process> list_p = h.parallelizeProcesses(arguments);
+        h.waitForProcesses(list_p);
+        this.readOutput(list_p);
+    }
+    public ArrayList<Process> runSlaves(ArrayList<String> list_m) {
         ArrayList<Process> list_p = new ArrayList<>();
         ArrayList<List<String>> arguments = new ArrayList<>();
 

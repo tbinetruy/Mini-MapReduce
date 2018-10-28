@@ -55,14 +55,18 @@ public class Helpers {
 
         return list_p;
     }
-    public void waitForProcesses(ArrayList<Process> list_p) {
+    public ArrayList<Process> waitForProcesses(ArrayList<Process> list_p) {
+        ArrayList<Process> successfulProcesses = new ArrayList<>();
         for(Process p : list_p) {
             try {
                 p.waitFor();
+                successfulProcesses.add(p);
             } catch(InterruptedException e) {
                 System.err.println("An error has occurred while waiting for a process.");
             }
         }
+
+        return successfulProcesses;
     }
     public String inputStream2String(InputStream is, boolean isError) {
         InputStreamReader isr = new InputStreamReader(is);
