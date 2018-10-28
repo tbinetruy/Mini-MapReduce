@@ -98,7 +98,7 @@ public class Master {
             ArrayList<String> UMs = new ArrayList<>();
             for(String word: machineWordsLocation.get(machine).keySet()) {
                 for(String UM: machineWordsLocation.get(machine).get(word)) {
-                    if(!UMs.contains(UM)) {
+                    if(!UMs.contains(UM) && !machine.equals(mapLocations.get(UM))) {
                         UMs.add(UM);
                     }
                 }
@@ -132,10 +132,10 @@ public class Master {
             for(String word: UMKeyMap.get(UM)) {
                 if(keyUMMap.get(word) == null) {
                     ArrayList<String> UMList = new ArrayList<>();
-                    UMList.add(UM.replace("/S", "/UM"));
+                    UMList.add(UM.replace("/S", "/UM").replace("/splits", "/maps"));
                     keyUMMap.put(word, UMList);
                 } else {
-                    keyUMMap.get(word).add(UM.replace("/S", "/UM"));
+                    keyUMMap.get(word).add(UM.replace("/S", "/UM").replace("/splits", "/maps"));
                 }
             }
         }
