@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import java.io.IOException;
 import java.lang.InterruptedException;
+import java.lang.reflect.Array;
 import java.util.stream.Collectors;
 import java.util.Arrays;
+import java.util.List;
 
 public class Deploy {
     Helpers h;
@@ -18,10 +20,20 @@ public class Deploy {
         this.deploySlave(list_working_m);
     }
     public void deploySlave(ArrayList<String> list_m) {
-        ArrayList<String> arguments = list_m.stream()
-            .map(m -> "ssh binetruy@" + m + " mkdir -p /tmp/binetruy; scp Slave.jar binetruy@" + m + ":/tmp/binetruy/")
-            .collect(Collectors.toCollection(ArrayList::new));
+
+
+        ArrayList<List<String>> arguments = new ArrayList<>();
+        for(String m: list_m) {
+            String cmd = "ssh binetruy@" + m + " mkdir -p /tmp/binetruy; scp Slave.jar binetruy@" + m + ":/tmp/binetruy/";
+            List<String> cmds = new ArrayList<String>();
+            cmds.add("bash");
+            cmds.add("-c");
+            cmds.add(cmd);
+            arguments.add(cmds);
+        }
+
         ArrayList<Process> list_p = h.parallelizeProcesses(arguments);
+
         for(int i = 0; i < list_m.size(); i++) {
             Process p = list_p.get(i);
             String s = h.readOutput(p);
