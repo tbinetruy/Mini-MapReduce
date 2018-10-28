@@ -37,9 +37,10 @@ public class Slave {
         }
         System.out.println(mapping.get(0).word);
 
-        boolean success = this.createDirectory("maps");
+        boolean success = this.createDirectory("/tmp/binetruy/maps");
+        String absoluteSplitPath = "/tmp/binetruy/splits/";
         if(success) {
-            String filePath = "maps/UM" + filename.substring(8);
+            String filePath = "/tmp/binetruy/maps/UM" + filename.substring(absoluteSplitPath.length() + 1);
             this.writeFile(mapping, filePath);
         }
     }
@@ -78,6 +79,7 @@ public class Slave {
         arg1.add("mkdir");
         arg1.add("-p");
         arg1.add(dirname);
+
         args.add(arg1);
 
         ArrayList<Process> list_p = h.parallelizeProcesses(args);

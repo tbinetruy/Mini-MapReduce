@@ -118,14 +118,14 @@ public class Helpers {
             }
         }
 
-        ArrayList<Process> list_p_new = new ArrayList<>();
+        ArrayList<Process> list_p_success = new ArrayList<>();
         for(int i = 0; i < list_p.size(); i++) {
             if(!killed_processes.contains(i)) {
-                list_p_new.add(list_p.get(i));
+                list_p_success.add(list_p.get(i));
             }
         }
 
-        return list_p_new;
+        return list_p_success;
     }
     public void destroyProcess(Process p, int i, ArrayList<Integer> killed_processes) {
         System.err.println("Timeout, destroying process " + Integer.toString(i, 10));
