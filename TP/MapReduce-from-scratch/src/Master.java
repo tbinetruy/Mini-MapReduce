@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.io.IOException;
 import java.lang.InterruptedException;
 import java.util.concurrent.TimeUnit;
@@ -29,23 +30,20 @@ public class Master {
     }
     public ArrayList<Process> startProcesses(ArrayList<String> list_m) {
         ArrayList<Process> list_p = new ArrayList<>();
+        ArrayList<List<String>> arguments = new ArrayList<>();
+
         // start processes in parallel
         for(int i = 0; i < list_m.size(); i++) {
-            ProcessBuilder pb = new ProcessBuilder("ssh",
-                                                   "binetruy@" + list_m.get(i),
-                                                   "java",
-                                                   "-jar",
-                                                   "/tmp/binetruy/Slave.jar");
-
-            try {
-                Process p = pb.start();
-                list_p.add(p);
-            } catch (IOException e) {
-                System.err.println("An error has occurred while starting the process " + Integer.toString(i) + ".");
-            }
+            List<String> l = new ArrayList<>();
+            l.add("ssh");
+            l.add("binetruy@" + list_m.get(i));
+            l.add("java");
+            l.add("-jar");
+            l.add("/tmp/binetruy/Slave.jar");
+            arguments.add(l);
         }
 
-        return list_p;
+        return h.parallelizeProcesses(arguments);
     }
     public ArrayList<Process> timeoutProcesses(ArrayList<Process> list_p) {
         boolean wasProcessKilled = false;
