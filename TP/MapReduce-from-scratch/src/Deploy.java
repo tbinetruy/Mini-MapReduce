@@ -13,7 +13,7 @@ public class Deploy {
         ArrayList<String> list_m = new ArrayList<>();
         list_m.add("c133-07");
         list_m.add("c133-08");
-        list_m.add("c133-08888");
+        list_m.add("c133-09");
 
         ArrayList<String> list_working_m = this.getReachableMachines(list_m);
         this.deploySlave(list_working_m);
