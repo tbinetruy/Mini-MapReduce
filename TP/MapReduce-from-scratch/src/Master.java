@@ -50,6 +50,39 @@ public class Master {
 
         System.out.println("Phase du SHUFFLE terminée.");
 
+        this.requestSlaveReduce(machineWordsMap);
+
+        System.out.println("Phase du Reduce terminée.");
+
+    }
+    void requestSlaveReduce(HashMap<String, HashMap<String, ArrayList<String>>> machineWordsMap) {
+        ArrayList<List<String>> cmds = new ArrayList<>();
+        for(String machine: machineWordsMap.keySet()) {
+            int counter = 0;
+            for(String word: machineWordsMap.get(machine).keySet()) {
+                List<String> cmd = new ArrayList<>();
+                cmd.add("ssh");
+                cmd.add("binetruy@" + machine);
+                cmd.add("java");
+                cmd.add("-jar");
+                cmd.add("/tmp/binetruy/Slave.jar");
+                cmd.add("2");
+                cmd.add(word);
+                cmd.add("/tmp/binetruy/maps/SM" + Integer.toString(counter) + ".txt");
+                cmd.add("/tmp/binetruy/reduces/RM" + Integer.toString(counter) + ".txt");
+                System.out.println(cmd);
+
+                cmds.add(cmd);
+
+                counter++;
+            }
+        }
+
+        ArrayList<Process> list_p = h.parallelizeProcesses(cmds);
+        h.waitForProcesses(list_p);
+        for(Process p: list_p) {
+            h.readOutput(p);
+        }
     }
     void requestSlaveShuffle(HashMap<String, HashMap<String, ArrayList<String>>> machineWordsMap) {
         ArrayList<List<String>> cmds = new ArrayList<>();
