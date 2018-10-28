@@ -32,7 +32,9 @@ public class Deploy {
 
         ArrayList<Process> list_p = h.parallelizeProcesses(arguments);
         h.waitForProcesses(list_p);
-
+        this.readOutput(list_m, list_p);
+    }
+    public void readOutput(ArrayList<String> list_m, ArrayList<Process> list_p) {
         for(int i = 0; i < list_m.size(); i++) {
             Process p = list_p.get(i);
             String s = h.readOutput(p);
