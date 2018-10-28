@@ -124,8 +124,11 @@ public class Slave {
         lines.add(new Line(key, count));
 
         boolean success = this.createDirectory("/tmp/binetruy/reduces");
-        if(success)
+        if(success) {
             this.writeFile(lines, outputFile);
+            Line line = lines.get(0);
+            System.out.println(line.word + " - " + Integer.toString(line.count));
+        }
     }
     public static void main(String[] args) {
         Slave slave = new Slave();
